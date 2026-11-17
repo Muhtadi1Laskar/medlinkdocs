@@ -14,7 +14,7 @@ export const findUser = async (email) => {
 export const userExists = async (email) => {
     const queryStr = `
         SELECT 
-        EXISTS(SELECT 1 FROM users WHERE emails = $1)
+        EXISTS(SELECT 1 FROM users WHERE email = $1)
     `;
 
     const result = await pool.query(queryStr, [email]);
