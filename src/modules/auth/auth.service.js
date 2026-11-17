@@ -13,10 +13,8 @@ export const signupService = async ({
     email,
     password
 }) => {
-    console.log("SALT: ", typeof process.env.PASSWORD_SALT);
     const salt = +process.env.PASSWORD_SALT;
     const existing = await userExists(email);
-
 
     if (existing) {
         throw new ApiError(
@@ -27,7 +25,6 @@ export const signupService = async ({
     }
 
     const passwordHash = await bcrypt.hash(password, salt);
-    console.log("Password: ", passwordHash);
     const user = await createUser({
         firstName,
         lastName,
