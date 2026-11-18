@@ -3,7 +3,11 @@ import { customSearch } from "../auth/auth.repository.js";
 import { createReport } from "./reports.repository.js";
 
 export const uploadReportService = async (data) => {
-    const userExists = await customSearch("user_id", "users", data.userId);
+    const userExists = await customSearch({
+        queryField: "user_id",
+        tableName: "users",
+        data: data.userId
+    });
 
     if (!userExists) {
         throw new ApiError(
