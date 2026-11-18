@@ -22,6 +22,17 @@ export const userExists = async (email) => {
     return result.rows[0].exists;
 }
 
+export const customSearch = async (queryField, tableName, data) => {
+    const queryStr = `
+        SELECT 
+        EXISTS(SELECT 1 FROM ${tableName} WHERE ${queryField} = $1)
+    `;
+
+    const result = await pool.query(queryStr, [data]);
+
+    return result.rows[0].exists;
+}
+
 export const createUser = async ({
     email, 
     firstName, 
