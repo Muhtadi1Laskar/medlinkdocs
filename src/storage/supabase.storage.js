@@ -69,12 +69,9 @@ export const getFileURL = async ({
     isDownloadAble,
     originalFilename
 }) => {
-    console.log(storageKey, isDownloadAble, originalFilename);
     const settings = isDownloadAble ?
         { download: originalFilename } :
         {};
-
-    console.log(settings);
 
     const { data, error } = await supabase
         .storage

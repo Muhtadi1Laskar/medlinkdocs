@@ -18,7 +18,10 @@ const pool = new Pool({
 });
 
 pool.on("error", (error) => {
-    console.log("Unexcepted database pool error: ", error);
-})
+    console.error("Unexpected database pool error:", {
+        message: error.message,
+        code: error.code
+    });
+});
 
 export default pool;

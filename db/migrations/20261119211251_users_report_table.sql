@@ -43,4 +43,3 @@ CREATE TABLE IF NOT EXISTS report (
 );
 
 -- migrate:down
-
