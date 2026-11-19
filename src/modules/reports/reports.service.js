@@ -1,7 +1,7 @@
 import { deleteFile, uploadFiles } from "../../storage/supabase.storage.js";
 import { ApiError } from "../../utils/error.js";
 import { customSearch } from "../auth/auth.repository.js";
-import { createReport } from "./reports.repository.js";
+import { createReport, retriveReportInfo } from "./reports.repository.js";
 
 export const uploadReportService = async (data) => {
     const userExists = await customSearch({
@@ -17,7 +17,7 @@ export const uploadReportService = async (data) => {
             "Invalid User"
         )
     }
-    
+
     const fileUpload = await uploadFiles(data.file, data.userId);
 
     try {
@@ -60,10 +60,45 @@ export const uploadReportService = async (data) => {
             await deleteFile(fileUpload.storageKey);
         } catch (cleanupError) {
             throw new ApiError(
-                400, 
+                400,
                 "DATA_DELETION_FAILED",
                 "Failed to clean up uploaded file"
             )
         }
     }
+}
+
+export const retriveReportInfoService = async (userId) => {
+    const reportExists = await customSearch({
+        queryField: "user_id",
+        tableName: "users",
+        data: userId
+    });
+
+    if (!reportExists) {
+        throw new ApiError(
+            404,
+            "INVALID_CREDENTIALS",
+            "Invalid User"
+        );
+    }
+
+    const reports = await retriveReportInfo(userId);
+
+    if (!reports) {
+        throw new ApiError(
+            500,
+            "FAILED_TO_FETCH",
+            "Failed to retrive the reports"
+        );
+    }
+
+    console.log(reports);
+
+    return {
+        message: "Successfully fetch all the reports information",
+        data: {
+            reports
+        }
+    };
 }

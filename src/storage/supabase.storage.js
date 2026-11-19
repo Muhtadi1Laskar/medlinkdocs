@@ -69,7 +69,7 @@ export const downloadData = async (storageKey) => {
     const { data, error } = await supabase
         .storage
         .from(BUCKET)
-        .download(storageKey);
+        .getPublicUrl([storageKey]);
 
     if(error) {
         throw new ApiError(
@@ -78,4 +78,6 @@ export const downloadData = async (storageKey) => {
             "Failed to download the file"
         );
     }
+
+    return data
 }

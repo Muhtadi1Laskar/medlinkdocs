@@ -60,3 +60,26 @@ export const createReport = async ({
 
     return result.rows[0] ?? null;
 }
+
+export const retriveReportInfo = async (userId) => {
+    const queryStr = `
+        SELECT 
+            report_id,
+            title,
+            test_type,
+            test_date,
+            reason_for_test,
+            doctor_name,
+            doctor_findings,
+            diagnostic_center_name,
+            follow_up_status,
+            created_at,
+            updated_at
+         FROM report WHERE user_id = $1
+         ORDER BY test_date DESC
+    `;
+
+    const result = await pool.query(queryStr, [userId]);
+
+    return result.rows ?? null;
+}

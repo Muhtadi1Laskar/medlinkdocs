@@ -1,5 +1,5 @@
 import { errorResponse, successResponse } from "../../utils/response.js";
-import { uploadReportService } from "./reports.service.js";
+import { retriveReportInfoService, uploadReportService } from "./reports.service.js";
 
 export const UploadReportController = async (req, res, next) => {
     try {
@@ -23,6 +23,15 @@ export const UploadReportController = async (req, res, next) => {
             file: req.file
         });
 
+        successResponse(res, response, 200);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const RetriveReportInfoController = async (req, res, next) => {
+    try {
+        const response = await retriveReportInfoService(req.userId);
         successResponse(res, response, 200);
     } catch (error) {
         next(error);
