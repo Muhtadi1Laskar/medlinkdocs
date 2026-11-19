@@ -14,9 +14,8 @@ export const createReport = async ({
     storageProvider,
     originalFilename,
     mimeType,
-    fullSize
+    fileSize
 }) => {
-    console.log("FOLLOW UP STATUS: ", followUpStatus);
     const queyryStr = `
         INSERT INTO
         report (
@@ -55,7 +54,7 @@ export const createReport = async ({
             storageProvider,
             originalFilename,
             mimeType,
-            fullSize
+            fileSize
         ]
     );
 

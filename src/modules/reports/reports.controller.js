@@ -20,11 +20,7 @@ export const UploadReportController = async (req, res, next) => {
             doctorFindings: req.body.doctorFindings,
             diagnosticCenterName: req.body.diagnosticCenterName,
             followUpStatus: req.body.followUpStatus,
-            storageKey: "dasdasd343s21423sadf",
-            storageProvider: "Storage Provider",
-            originalFilename: req.file.originalname,
-            mimeType: req.file.mimetype,
-            fullSize: req.file.size
+            file: req.file
         });
 
         successResponse(res, response, 200);
