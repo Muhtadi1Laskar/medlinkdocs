@@ -1,10 +1,10 @@
-import { deleteFile, uploadFiles } from "../../storage/supabase.storage.js";
+import { deleteFile, getFileURL, uploadFiles } from "../../storage/supabase.storage.js";
 import { ApiError } from "../../utils/error.js";
-import { customSearch } from "../auth/auth.repository.js";
-import { createReport, retriveReportInfo } from "./reports.repository.js";
+import { customExistCheck } from "../auth/auth.repository.js";
+import { createReport, retriveFileMetaData, retriveReportInfo } from "./reports.repository.js";
 
 export const uploadReportService = async (data) => {
-    const userExists = await customSearch({
+    const userExists = await customExistCheck({
         queryField: "user_id",
         tableName: "users",
         data: data.userId
@@ -28,8 +28,6 @@ export const uploadReportService = async (data) => {
         };
 
         const report = await createReport(requestData);
-
-        console.log("Created Report", report);
 
         if (!report) {
             throw new ApiError(
@@ -63,13 +61,13 @@ export const uploadReportService = async (data) => {
                 400,
                 "DATA_DELETION_FAILED",
                 "Failed to clean up uploaded file"
-            )
+            );
         }
-    }
+    };
 }
 
 export const retriveReportInfoService = async (userId) => {
-    const reportExists = await customSearch({
+    const reportExists = await customExistCheck({
         queryField: "user_id",
         tableName: "users",
         data: userId
@@ -93,12 +91,46 @@ export const retriveReportInfoService = async (userId) => {
         );
     }
 
-    console.log(reports);
-
     return {
         message: "Successfully fetch all the reports information",
         data: {
             reports
+        }
+    };
+}
+
+export const retriveFileURLService = async ({
+    userId,
+    reportId,
+    isDownloadAble
+}) => {
+    const fileMetaData = await retriveFileMetaData({
+        userId,
+        reportId
+    });
+
+    if (!fileMetaData) {
+        throw new ApiError(
+            500,
+            "FAILED_TO_FETCH",
+            "Failed to retrive meta data"
+        );
+    }
+
+    const signedURL = await getFileURL({
+        storageKey: fileMetaData.storage_key,
+        isDownloadAble: isDownloadAble,
+        originalFilename: fileMetaData.original_filename
+    });
+
+    return {
+        message: "Successfully retrived the file",
+        data: {
+            report: {
+                mimeType: fileMetaData.mime_type,
+                originalFilename: fileMetaData.original_filename,
+                fileURL: signedURL.url
+            }
         }
     };
 }

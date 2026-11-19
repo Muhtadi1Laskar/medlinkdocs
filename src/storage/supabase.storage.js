@@ -40,7 +40,6 @@ export const uploadFiles = async (file, userId) => {
         );
     }
 
-
     return {
         storageKey: data.path,
         storageProvider: "supabase",
@@ -65,19 +64,33 @@ export const deleteFile = async (storageKey) => {
     }
 }
 
-export const downloadData = async (storageKey) => {
+export const getFileURL = async ({
+    storageKey,
+    isDownloadAble,
+    originalFilename
+}) => {
+    console.log(storageKey, isDownloadAble, originalFilename);
+    const settings = isDownloadAble ?
+        { download: originalFilename } :
+        {};
+
+    console.log(settings);
+
     const { data, error } = await supabase
         .storage
         .from(BUCKET)
-        .getPublicUrl([storageKey]);
+        .createSignedUrl(storageKey, 300, settings);
 
-    if(error) {
+    if (error) {
         throw new ApiError(
             500,
             "FAIL_DATA_RETRIVAL",
-            "Failed to download the file"
+            "Failed to create file url"
         );
     }
 
-    return data
+    return {
+        url: data.signedUrl
+    };
 }
+

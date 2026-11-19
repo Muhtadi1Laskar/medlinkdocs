@@ -75,11 +75,31 @@ export const retriveReportInfo = async (userId) => {
             follow_up_status,
             created_at,
             updated_at
-         FROM report WHERE user_id = $1
+         FROM report 
+         WHERE user_id = $1
          ORDER BY test_date DESC
     `;
 
     const result = await pool.query(queryStr, [userId]);
 
     return result.rows ?? null;
+}
+
+export const retriveFileMetaData = async ({ userId, reportId }) => {
+    const queryStr = `
+        SELECT 
+            storage_key,
+            mime_type,
+            original_filename
+        FROM report 
+        WHERE user_id = $1
+            AND report_id = $2 
+    `;
+
+    const result = await pool.query(queryStr, [
+        userId, 
+        reportId
+    ]);
+
+    return result.rows[0] ?? null;
 }

@@ -22,7 +22,7 @@ export const userExists = async (email) => {
     return result.rows[0].exists;
 }
 
-export const customSearch = async ({
+export const customExistCheck = async ({
     queryField,
     tableName,
     data }) => {
