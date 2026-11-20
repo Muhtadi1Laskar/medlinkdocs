@@ -1,5 +1,6 @@
 import { errorResponse, successResponse } from "../../utils/response.js";
 import {
+    deleteFleService,
     retriveFileURLService,
     retriveReportInfoService,
     uploadReportService
@@ -48,6 +49,18 @@ export const RetriveFileURLController = async (req, res, next) => {
             userId: req.userId,
             reportId: req.body.reportId,
             isDownloadAble: req.body.isDownloadAble
+        });
+        successResponse(res, response, 200);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const DeleteFileController = async (req, res, next) => {
+    try {
+        const response = await deleteFleService({
+            userId: req.userId,
+            reportId: req.body.reportId
         });
         successResponse(res, response, 200);
     } catch (error) {

@@ -1,7 +1,7 @@
 import { deleteFile, getFileURL, uploadFiles } from "../../storage/supabase.storage.js";
 import { ApiError } from "../../utils/error.js";
 import { customExistCheck } from "../auth/auth.repository.js";
-import { createReport, retriveFileMetaData, retriveReportInfo } from "./reports.repository.js";
+import { createReport, deleteFileMetaData, retriveFileMetaData, retriveReportInfo } from "./reports.repository.js";
 
 export const uploadReportService = async (data) => {
     const userExists = await customExistCheck({
@@ -104,6 +104,20 @@ export const retriveFileURLService = async ({
     reportId,
     isDownloadAble
 }) => {
+    const reportExists = await customExistCheck({
+        queryField: "report_id",
+        tableName: "report",
+        data: reportId
+    });
+
+    if (!reportExists) {
+        throw new ApiError(
+            404,
+            "NO_DATA_FOUND",
+            "There is no report under the given report ID. "
+        );
+    }
+    
     const fileMetaData = await retriveFileMetaData({
         userId,
         reportId
@@ -133,4 +147,74 @@ export const retriveFileURLService = async ({
             }
         }
     };
+}
+
+export const deleteFleService = async ({
+    userId,
+    reportId
+}) => {
+    const report = await retriveFileMetaData({
+        userId,
+        reportId
+    });
+
+    if (!report) {
+        throw new ApiError(
+            404,
+            "NO_DATA_FOUND",
+            "Report not found"
+        );
+    }
+
+    try {
+        await deleteFile(report.storage_key);
+    } catch (error) {
+        console.error("Storage deletion failed", {
+            reportId,
+            error
+        });
+
+        throw new ApiError(
+            400,
+            "DATA_DELETION_FAILED",
+            "Failed to clean up uploaded file"
+        );
+    }
+
+    try {
+        const deletedReport = await deleteFileMetaData({
+            userId,
+            reportId
+        });
+
+        if (!deletedReport) {
+            throw new ApiError(
+                400,
+                "DATA_DELETION_FAILED",
+                "Failed to delete the report meta data"
+            );
+        }
+
+        return {
+            message: "Successfully deleted the report",
+            data: {
+                report: deletedReport
+            }
+        };
+    } catch (error) {
+        if (error instanceof ApiError) {
+            throw error;
+        }
+
+        console.error("Database deletion failed", {
+            reportId,
+            error
+        });
+
+        throw new ApiError(
+            500,
+            "DATA_DELETION_FAILED",
+            "Failed to delete report metadata"
+        );
+    }
 }

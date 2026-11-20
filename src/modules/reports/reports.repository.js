@@ -85,7 +85,10 @@ export const retriveReportInfo = async (userId) => {
     return result.rows ?? null;
 }
 
-export const retriveFileMetaData = async ({ userId, reportId }) => {
+export const retriveFileMetaData = async ({
+    userId,
+    reportId
+}) => {
     const queryStr = `
         SELECT 
             storage_key,
@@ -96,10 +99,30 @@ export const retriveFileMetaData = async ({ userId, reportId }) => {
             AND report_id = $2 
     `;
 
-    const result = await pool.query(queryStr, [
-        userId, 
-        reportId
-    ]);
+    const result = await pool.query(
+        queryStr, 
+        [ userId, reportId]
+    );
+
+    return result.rows[0] ?? null;
+}
+
+export const deleteFileMetaData = async ({
+    userId,
+    reportId
+}) => {
+    const queryStr = `
+        DELETE FROM report
+        WHERE user_id = $1 AND report_id = $2
+        RETURNING 
+            report_id,
+            title,
+            original_filename
+    `;
+    const result = await pool.query(
+        queryStr, 
+        [userId, reportId]
+    );
 
     return result.rows[0] ?? null;
 }
