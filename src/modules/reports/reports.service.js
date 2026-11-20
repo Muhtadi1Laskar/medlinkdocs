@@ -1,7 +1,12 @@
 import { deleteFile, getFileURL, uploadFiles } from "../../storage/supabase.storage.js";
 import { ApiError } from "../../utils/error.js";
 import { customExistCheck } from "../auth/auth.repository.js";
-import { createReport, deleteFileMetaData, retriveFileMetaData, retriveReportInfo } from "./reports.repository.js";
+import { 
+    createReport, 
+    deleteFileMetaData, 
+    retriveFileMetaData, 
+    retriveReportInfo 
+} from "./reports.repository.js";
 
 export const uploadReportService = async (data) => {
     const userExists = await customExistCheck({
@@ -117,7 +122,7 @@ export const retriveFileURLService = async ({
             "There is no report under the given report ID. "
         );
     }
-    
+
     const fileMetaData = await retriveFileMetaData({
         userId,
         reportId
